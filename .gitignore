@@ -1,0 +1,50 @@
+# Build output
+**/bin/
+**/obj/
+[Dd]ebug/
+[Rr]elease/
+[Aa]rtifacts/
+
+# Test output and coverage
+**/TestResults/
+*.coverage
+*.coveragexml
+
+# Visual Studio
+.vs/
+*.suo
+*.user
+*.userosscache
+*.sln.docstates
+
+# JetBrains Rider
+.idea/
+*.sln.iml
+
+# Local configuration and secrets
+.env
+.env
+appsettings.Local.json
+appsettings.*.local.json
+secrets.json
+*.pfx
+*.p12
+*.key
+*.pem
+
+# Local databases and database sidecar files
+*.db
+*.db-shm
+*.db-wal
+*.sqlite
+*.sqlite3
+
+# Logs
+*.log
+**/Logs/
+**/logs/
+
+# Operating system files
+.DS_Store
+Thumbs.db
+Desktop.ini
