@@ -44,6 +44,9 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v5
 
+      - name: Validate Compose configuration
+        run: docker compose -f compose.yaml config --quiet
+
       - name: Validate Docker Hub account
         run: test -n "$DOCKER_ACCOUNT"
 
@@ -58,7 +61,7 @@ jobs:
 
       - name: Build application images with Compose
         run: >-
-          docker compose build
+          docker compose -f compose.yaml build
           authentificationapi
           gestionordinateurs-api
           gestionordinateurs-client
@@ -66,7 +69,7 @@ jobs:
 
       - name: Push application images with Compose
         run: >-
-          docker compose push
+          docker compose -f compose.yaml push
           authentificationapi
           gestionordinateurs-api
           gestionordinateurs-client
