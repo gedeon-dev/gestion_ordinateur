@@ -64,7 +64,6 @@ jobs:
   
   # Sachez qu'il y a une particularité pour le projet web blazor. (création du fichier nginx.conf par exemple ci-dessous)
   Faire tourner le front sur le  port 5000 (penser à modifier les CORS ORIGINE)
-  `
   server {
   listen 5000;
   server_name localhost;
