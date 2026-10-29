@@ -17,6 +17,6 @@ FROM mcr.microsoft.com/dotnet/aspnet:10.0 AS runtime
 WORKDIR /app
 COPY --from=build /app/publish .
 
-ENV ASPNETCORE_HTTP_PORTS=5025
-EXPOSE 5025
+ENV ASPNETCORE_HTTP_PORTS=5015
+EXPOSE 5015
 ENTRYPOINT ["dotnet", "GestionOrdinateurs.API.dll"]
