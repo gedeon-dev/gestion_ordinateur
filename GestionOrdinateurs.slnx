@@ -1,4 +1,7 @@
 <Solution>
+  <Folder Name="/Solution Items/">
+    <File Path="compose.yaml" />
+  </Folder>
   <Project Path="AuthentificationApi/AuthentificationApi.csproj" />
   <Project Path="GestionOrdinateurs.API/GestionOrdinateurs.API.csproj" />
   <Project Path="GestionOrdinateurs.Client/GestionOrdinateurs.Client.csproj" />
