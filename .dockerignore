@@ -1,0 +1,12 @@
+**/bin/
+**/obj/
+**/TestResults/
+.git/
+.idea/
+**/Logs/
+**/logs/
+*.db
+*.db-shm
+*.db-wal
+*.sqlite
+*.sqlite3
