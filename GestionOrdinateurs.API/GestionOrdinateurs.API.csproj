@@ -24,4 +24,10 @@
     <ProjectReference Include="..\GestionOrdinateurs.Shared\GestionOrdinateurs.Shared.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Content Include="parcinfo.db">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+  </ItemGroup>
+
 </Project>

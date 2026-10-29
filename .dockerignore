@@ -6,6 +6,7 @@
 **/Logs/
 **/logs/
 *.db
+!GestionOrdinateurs.API/parcinfo.db
 *.db-shm
 *.db-wal
 *.sqlite
