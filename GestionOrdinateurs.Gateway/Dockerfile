@@ -2,9 +2,11 @@ FROM mcr.microsoft.com/dotnet/sdk:10.0 AS build
 WORKDIR /src
 
 COPY ["GestionOrdinateurs.Gateway/GestionOrdinateurs.Gateway.csproj", "GestionOrdinateurs.Gateway/"]
+COPY ["GestionOrdinateurs.Shared/GestionOrdinateurs.Shared.csproj", "GestionOrdinateurs.Shared/"]
 RUN dotnet restore "GestionOrdinateurs.Gateway/GestionOrdinateurs.Gateway.csproj"
 
 COPY GestionOrdinateurs.Gateway/ GestionOrdinateurs.Gateway/
+COPY GestionOrdinateurs.Shared/ GestionOrdinateurs.Shared/
 RUN dotnet publish "GestionOrdinateurs.Gateway/GestionOrdinateurs.Gateway.csproj" \
     --configuration Release \
     --output /app/publish \

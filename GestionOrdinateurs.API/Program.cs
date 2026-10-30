@@ -6,15 +6,14 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi;
-using System.Text;
 using System.Text.Json.Serialization;
 
 var builder = WebApplication.CreateBuilder(args);
 
-var jwtKey = builder.Configuration["Jwt:Key"];
-if (string.IsNullOrWhiteSpace(jwtKey) || Encoding.UTF8.GetByteCount(jwtKey) < 32)
+var keycloakAuthority = builder.Configuration["Keycloak:Authority"];
+if (!Uri.TryCreate(keycloakAuthority, UriKind.Absolute, out var keycloakAuthorityUri))
 {
-    throw new InvalidOperationException("La configuration Jwt:Key doit contenir au moins 32 octets.");
+    throw new InvalidOperationException("La configuration Keycloak:Authority doit être une URL absolue.");
 }
 
 var allowedOrigins = builder.Configuration.GetSection("Cors:AllowedOrigins").Get<string[]>() ?? [];
@@ -49,21 +48,36 @@ builder.Services.AddSwaggerGen(options =>
         [new OpenApiSecuritySchemeReference("Bearer", document)] = []
     });
 });
-var signingKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtKey));
 builder.Services
     .AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
     .AddJwtBearer(options =>
     {
-        options.RequireHttpsMetadata = false;
+        options.Authority = keycloakAuthorityUri.ToString().TrimEnd('/');
+        options.RequireHttpsMetadata = !builder.Environment.IsDevelopment();
         options.SaveToken = true;
         options.TokenValidationParameters = new TokenValidationParameters
         {
-            ValidateIssuerSigningKey = true,
-            IssuerSigningKey = signingKey,
-            ValidateIssuer = false,
-            ValidateAudience = false,
-            RoleClaimType = System.Security.Claims.ClaimTypes.Role
+            ValidateIssuer = true,
+            ValidIssuer = keycloakAuthorityUri.ToString().TrimEnd('/'),
+            ValidateAudience = true,
+            ValidAudience = "gestionordinateurs-api",
+            NameClaimType = "preferred_username",
+            RoleClaimType = "roles"
         };
+        var backchannelAuthority = builder.Configuration["Keycloak:BackchannelAuthority"];
+        if (!string.IsNullOrWhiteSpace(backchannelAuthority))
+        {
+            if (!Uri.TryCreate(backchannelAuthority, UriKind.Absolute, out var backchannelUri))
+            {
+                throw new InvalidOperationException(
+                    "La configuration Keycloak:BackchannelAuthority doit être une URL absolue.");
+            }
+
+            options.BackchannelHttpHandler = new GestionOrdinateurs.Shared.KeycloakBackchannelHandler(
+                keycloakAuthorityUri,
+                backchannelUri,
+                new HttpClientHandler());
+        }
         options.Events = new JwtBearerEvents
         {
             OnTokenValidated = context =>

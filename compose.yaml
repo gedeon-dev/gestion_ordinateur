@@ -23,11 +23,12 @@ services:
       KC_HEALTH_ENABLED: "true"
       KC_HOSTNAME_STRICT_BACKCHANNEL: "false"
       KC_HOSTNAME_STRICT_HTTPS: "false"
-    command: start-dev
+    command: start-dev --import-realm
     ports:
       - "8180:8080"
     volumes:
       - keycloak_data:/opt/keycloak/data
+      - ./keycloak:/opt/keycloak/data/import:ro
     networks:
       - appnet
 
@@ -38,12 +39,13 @@ services:
       dockerfile: AuthentificationApi/Dockerfile
     environment:
       ASPNETCORE_ENVIRONMENT: Development
-      UsersApi__BaseAddress: http://gestionordinateurs-api:5015/
+      Keycloak__TokenEndpoint: http://keycloak:8080/realms/gestion-ordinateurs/protocol/openid-connect/token
+      Keycloak__ClientId: gestion-client
       Cors__AllowedOrigins__0: http://localhost:5000
     ports:
       - "5273:5273"
     depends_on:
-      - gestionordinateurs-api
+      - keycloak
     networks:
       - appnet
 
@@ -54,6 +56,8 @@ services:
       dockerfile: GestionOrdinateurs.API/Dockerfile
     environment:
       ASPNETCORE_ENVIRONMENT: Development
+      Keycloak__Authority: http://localhost:8180/realms/gestion-ordinateurs
+      Keycloak__BackchannelAuthority: http://keycloak:8080
       Cors__AllowedOrigins__0: http://localhost:5000
     ports:
       - "5015:5015"
@@ -67,12 +71,15 @@ services:
       dockerfile: GestionOrdinateurs.Gateway/Dockerfile
     environment:
       ASPNETCORE_ENVIRONMENT: Development
+      Keycloak__Authority: http://localhost:8180/realms/gestion-ordinateurs
+      Keycloak__BackchannelAuthority: http://keycloak:8080
       Cors__AllowedOrigins__0: http://localhost:5000
       ReverseProxy__Clusters__gestionOrdinateurs__Destinations__api__Address: http://gestionordinateurs-api:5015/
     ports:
       - "5010:5010"
     depends_on:
       - gestionordinateurs-api
+      - keycloak
     networks:
       - appnet
 

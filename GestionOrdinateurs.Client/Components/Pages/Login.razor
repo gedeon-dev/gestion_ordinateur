@@ -20,6 +20,12 @@
         <ValidationMessage For="() => credentials.Login" />
     </div>
 
+    <div class="mb-3">
+        <label for="password" class="form-label">Mot de passe</label>
+        <InputText id="password" type="password" class="form-control" @bind-Value="credentials.Password" />
+        <ValidationMessage For="() => credentials.Password" />
+    </div>
+
     <button class="btn btn-primary" type="submit" disabled="@isSubmitting">
         @(isSubmitting ? "Connexion..." : "Se connecter")
     </button>
@@ -47,11 +53,11 @@
             var client = HttpClientFactory.CreateClient("AuthenticationApi");
             using var response = await client.PostAsJsonAsync(
                 "api/authentication",
-                new LoginRequest(credentials.Login));
+                new LoginRequest(credentials.Login, credentials.Password));
 
-            if (response.StatusCode == System.Net.HttpStatusCode.NotFound)
+            if (response.StatusCode == System.Net.HttpStatusCode.Unauthorized)
             {
-                ShowMessage("Cet utilisateur n'existe pas.", "alert-warning");
+                ShowMessage("Identifiant ou mot de passe invalide.", "alert-warning");
                 return;
             }
 
@@ -69,6 +75,7 @@
             }
 
             await SessionStorage.SetItemAsync(TokenSessionKey, tokenResponse.Token);
+            credentials.Password = string.Empty;
             NavigationManager.NavigateTo("/");
         }
         catch (HttpRequestException)
@@ -95,9 +102,12 @@
     {
         [Required(ErrorMessage = "Le login est obligatoire.")]
         public string Login { get; set; } = string.Empty;
+
+        [Required(ErrorMessage = "Le mot de passe est obligatoire.")]
+        public string Password { get; set; } = string.Empty;
     }
 
-    private sealed record LoginRequest(string Login);
+    private sealed record LoginRequest(string Login, string Password);
 
     private sealed class TokenResponse
     {
